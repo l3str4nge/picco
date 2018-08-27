@@ -24,4 +24,3 @@ class FileCloner:
     def temporary_path(self):
         return os.path.join(self.TMP)
 
-

@@ -1,0 +1,16 @@
+TODO:
+- Single file class representation with metadata etc,
+- add argument for date range (to proper collect images) -> this is for example for single backup
+- add oportunity for JSON files to declare whole config like:
+{
+    'wakacje1': [date1, date],
+    .
+    .
+    .
+    'wakaceN': [dateN, dateN+1]
+} it will be easier to create whole backup
+- tests
+- class/function for read file and collect it to given directory
+- versions? :D
+- tests,
+-make something with files that not have metadata or movies
