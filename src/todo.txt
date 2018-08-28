@@ -1,4 +1,5 @@
 TODO:
+- GOOGLE DRIVE API
 - Single file class representation with metadata etc,
 - add argument for date range (to proper collect images) -> this is for example for single backup
 - create logger class for entire application with saving into file
