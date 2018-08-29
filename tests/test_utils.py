@@ -1,4 +1,5 @@
 import os
+import sys
 import shutil
 from unittest import TestCase
 from src.utils import FileCloner, FileSieve, ImageObject
@@ -11,6 +12,7 @@ class BaseTest(TestCase):
         self.dir_name = 'TEST'
         self.dir_to_clone = 'TO_CLONE'
 
+        # TODO: change to real image dataset
         os.mkdir(os.path.join('/tmp', self.dir_to_clone))
 
         for _ in range(self.FILES_NUMBER):
@@ -44,10 +46,19 @@ class TestFileSieve(BaseTest):
         shutil.rmtree(os.path.join('/tmp', self.dest_name))
 
     def test_group(self):
+        sieve = FileSieve('/tmp/TO_CLONE', '/tmp', 'FINAL', [])
+        sieve.group()
+        print(os.listdir('/tmp/FINAL'))
+        shutil.rmtree('/tmp/FINAL')
+
+"""
+
+    def test_group(self):
         out = os.path.join('/tmp', self.dir_to_clone)
         dest = os.path.join('/tmp', self.dest_name)
         sieve = FileSieve(out, dest, 'ELO', None)
         sieve.group()
+"""
 
 class TestImageObject(TestCase):
 
@@ -61,6 +72,8 @@ class TestImageObject(TestCase):
         obj = ImageObject('dd.Name-eld.png', 'TEST')
         self.assertEqual(obj.get_extension(), 'png')
 
-
-
+    def test_exif_data(self):
+        path_object = '/home/zawadeusz/Documents/picco/tests/images'
+        obj = ImageObject('TEST1.jpg', path_object)
+        print(obj.created())
 
