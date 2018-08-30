@@ -1,6 +1,7 @@
 import os
 import shutil
 import logging
+from datetime import datetime
 
 from PIL import Image
 
@@ -56,14 +57,38 @@ class ImageObject:
         return self.name.split('.')[-1]
 
     def is_valid_extension(self):
-        return self.get_extension in self.VALID.FORMATS
+        return self.get_extension() in self.VALID_FORMATS
 
-    def in_range(self):
-        #TODO: check if self is in range of dates
-        pass
+    def is_valid(self, date_range):
+        return self.get_extension() and self.in_range(date_range)
+
+    def in_range(self, date_range):
+        """
+            by default:
+            201801011520-201801012000
+            more date ranges in the future ....
+            exif is like: %YYYY:%m%d %H%M%S
+        """
+        date_format = '%Y%m%d%H%M'
+        exif_date_format = '%Y:%m:%d %H:%M:%S'
+        splitted = date_range.split('-')
+        date_start = datetime.strptime(splitted[0], date_format)
+        date_end = datetime.strptime(splitted[1], date_format)
+        #TODO DATE ERROR HANDLING at the application start in new validator
+
+        date_created = self.created()
+        if not date_created:
+            return False
+
+        date_created = date_created.replace(':', '').replace(' ', '')[:-2]
+        date_created = datetime.strptime(date_created, date_format)
+        return date_start <= date_created <= date_end
 
     def get_exif_data(self):
-        return self.instance._getexif()
+        if self.instance:
+            return self.instance._getexif()
+
+        return {}
 
     def created(self):
         return self.get_exif_data().get(self.DATE_CODE, None)
@@ -92,15 +117,15 @@ class FileSieve:
         self.date_range = date_range
         self.cloner = FileCloner(dir_name)
 
-
     def group(self):
         os.mkdir(self.dest_path)
+        for i, img_obj in enumerate(ImageCollector.collect(self.out_path)):
+            if img_obj.is_valid(self.date_range):
+                img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
+                new_file_path = os.path.join(self.dest_path, img_obj.name)
+                self.cloner.clone_single_file(img_obj.path, new_file_path)
 
-        for image_obj in ImageCollector.collect(self.out_path):
-            new_file_path = os.path.join(self.dest_path, image_obj.name)
-            self.cloner.clone_single_file(image_obj.path, new_file_path)
-
-            # TODO: clone object, check extension, rename etc etc
+            # sort self.out_path by date!
             # check extension
             # check range of date, if not group to others
             # check if exists in new folder

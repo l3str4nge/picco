@@ -44,21 +44,23 @@ class TestFileSieve(BaseTest):
     def tearDown(self):
         super().tearDown()
         shutil.rmtree(os.path.join('/tmp', self.dest_name))
+        if os.path.exists('/tmp/FINAL'):
+            shutil.rmtree('/tmp/FINAL')
 
     def test_group(self):
-        sieve = FileSieve('/tmp/TO_CLONE', '/tmp', 'FINAL', [])
+        date_range = '201705151001-201710101010'
+        sieve = FileSieve('/tmp/TO_CLONE', '/tmp', 'FINAL', date_range)
         sieve.group()
         print(os.listdir('/tmp/FINAL'))
         shutil.rmtree('/tmp/FINAL')
 
-"""
-
-    def test_group(self):
-        out = os.path.join('/tmp', self.dir_to_clone)
-        dest = os.path.join('/tmp', self.dest_name)
-        sieve = FileSieve(out, dest, 'ELO', None)
-        sieve.group()
-"""
+    def test_group_with_real_images(self):
+        test_path = '/home/zawadeusz/Documents/picco/tests/images'
+        date_range = '201705151001-201710101010'
+        sievie = FileSieve(test_path, '/tmp', 'FINAL', date_range)
+        sievie.group()
+        print('realimages', os.listdir('/tmp/FINAL'))
+        shutil.rmtree('/tmp/FINAL')
 
 class TestImageObject(TestCase):
 
