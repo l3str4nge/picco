@@ -35,9 +35,9 @@ class FileCloner:
         return os.path.join(self.TMP)
 
 
-
 class ImageObject:
     VALID_FORMATS = ['jpg', 'png']
+    VALID_MOVIE_FORMATS = ['3gp, avi', 'mp4']
     DATE_CODE = 36867
 
     def __init__(self, name, dir_path):
@@ -109,6 +109,26 @@ class ImageCollector:
             for f in files:
                 yield ImageObject(f, path)
 
+class FileContainer:
+    def __init__(self, dest_path):
+        self.dest_path = dest_path
+        self.files = self.get_files()
+
+    def get_files(self):
+        return [x for x in ImageCollector.collect(self.dest_path)]
+
+    def __contains__(self, image_obj):
+        return image_obj in self.files
+
+    def add(self, image_obj):
+        self.files.append(image_obj)
+
+    def sort(self):
+        sorted_files = sorted(self.files, key=lambda k: k.created())
+        for i, f in enumerate(sorted_files):
+            pass
+            # TODO add sorting after firsts tests
+
 class FileSieve:
     def __init__(self, out, dest, dir_name, date_range):
         self.out_path = os.path.join(out)
@@ -116,6 +136,7 @@ class FileSieve:
         self.dir_name = dir_name
         self.date_range = date_range
         self.cloner = FileCloner(dir_name)
+        self.container = FileContainer(self.dest_path)
 
     def group(self):
         os.mkdir(self.dest_path)
@@ -123,12 +144,13 @@ class FileSieve:
             if img_obj.is_valid(self.date_range):
                 img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
                 new_file_path = os.path.join(self.dest_path, img_obj.name)
-                self.cloner.clone_single_file(img_obj.path, new_file_path)
+                img_obj.path = new_file_path
 
-            # sort self.out_path by date!
-            # check extension
-            # check range of date, if not group to others
-            # check if exists in new folder
-            # clone
+                if not img_obj in self.container:
+                    self.cloner.clone_single_file(img_obj.path, new_file_path)
+                    self.container.add(img_obj)
+                else:
+                    print('Image exists in this path')
 
+        self.container.sort()
 

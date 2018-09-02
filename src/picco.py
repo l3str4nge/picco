@@ -13,6 +13,7 @@ def main():
     parser = argparse.ArgumentParser(description='Test')
     parser.add_argument('--in', help='Path for the INPUT files')
     parser.add_argument('--out', help='Path for the OUTPUT files')
+    parser.add_argument('--date', help='Date when files where made')
     parser.add_argument('--name', help='Folder name to create in --out')
     args = parser.parse_args()
 
