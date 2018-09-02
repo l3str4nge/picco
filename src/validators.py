@@ -3,7 +3,7 @@ import os
 import argparse
 import sys
 import logging
-from abc import ABC
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
@@ -20,21 +20,22 @@ class DateRangeValidator(BaseValidator):
         date_range = self.param
 
         if not date_range:
-            logger.info('Date range is not defined, all files will be cloned...')
+            logger.info('Date range is not defined, all files will be cloned...\n')
             return True
 
         date_format = '%Y%m%d%H%M'
         splitted = date_range.split('-')
 
-        if len(splitted) is not 2:
-            logger.info('Date range is not specified correctly')
+        if len(splitted) != 2:
+            sys.stdout.write('daterange is not correctly\n')
+            logger.info('Date range is not specified correctly\n')
             return False
 
         date_start = datetime.strptime(splitted[0], date_format)
         date_end = datetime.strptime(splitted[1], date_format)
 
         if date_start > date_end:
-            logger.info('Date end cannot be bigger than date start')
+            logger.info('Date end cannot be bigger than date start\n')
             return False
 
         return True
@@ -45,6 +46,10 @@ class PathValidator(BaseValidator):
         return self.path_exist()
 
     def path_exist(self):
+        if not self.dir_path:
+             sys.stdout.write(f'Path cannot be empty\n')
+             return False
+
         if not os.path.exists(os.path.join(self.dir_path)):
              sys.stdout.write(f'Directory {self.dir_path} does not exists.\n')
              return False
@@ -55,7 +60,7 @@ class NameValidator(BaseValidator):
     def is_valid(self):
         self.name = self.param
         if not self.name:
-            sys.stdout.write('Name is not defined, please try again...')
+            sys.stdout.write('Name is not defined, please try again...\n')
             return False
 
         return True
@@ -67,12 +72,14 @@ class CommandArgsValidator:
                 PathValidator(self.kwargs['in']),
                 PathValidator(self.kwargs['out']),
                 NameValidator(self.kwargs['name']),
-                DateRangeValidator(self.kwargs['name']),
+                DateRangeValidator(self.kwargs['date']),
         ]
 
     def check(self):
         for validator in self.validators:
-            validator.is_valid()
+            if not validator.is_valid():
+                return False
+
 
 
         """
