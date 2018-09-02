@@ -25,6 +25,11 @@ class DateRangeValidator(BaseValidator):
 
         date_format = '%Y%m%d%H%M'
         splitted = date_range.split('-')
+
+        if len(splitted) is not 2:
+            logger.info('Date range is not specified correctly')
+            return False
+
         date_start = datetime.strptime(splitted[0], date_format)
         date_end = datetime.strptime(splitted[1], date_format)
 
