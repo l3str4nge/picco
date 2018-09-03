@@ -1,8 +1,14 @@
+from utils import FileSieve
 
 class Application(object):
     def __init__(self, *args, **kwargs):
-        print(kwargs)
-        self.name = 'test'
+
+        self.sieve = FileSieve(
+                kwargs.get('in'),
+                kwargs.get('out'),
+                kwargs.get('name'),
+                kwargs.get('date')
+        )
 
     def run(self):
-        for a in range(9): print(a)
+        self.sieve.group()

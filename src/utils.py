@@ -37,7 +37,7 @@ class FileCloner:
 
 class ImageObject:
     VALID_FORMATS = ['jpg', 'png']
-    VALID_MOVIE_FORMATS = ['3gp, avi', 'mp4']
+    VALID_MOVIE_FORMATS = ['3gp', 'avi', 'mp4']
     DATE_CODE = 36867
 
     def __init__(self, name, dir_path):
@@ -69,12 +69,15 @@ class ImageObject:
             more date ranges in the future ....
             exif is like: %YYYY:%m%d %H%M%S
         """
+
+        if not date_range:
+            # we allow to not hae date_range to clone whole files
+            return True
         date_format = '%Y%m%d%H%M'
         exif_date_format = '%Y:%m:%d %H:%M:%S'
         splitted = date_range.split('-')
         date_start = datetime.strptime(splitted[0], date_format)
         date_end = datetime.strptime(splitted[1], date_format)
-        #TODO DATE ERROR HANDLING at the application start in new validator
 
         date_created = self.created()
         if not date_created:
@@ -93,11 +96,11 @@ class ImageObject:
     def created(self):
         return self.get_exif_data().get(self.DATE_CODE, None)
 
-    def __eq__(self, other):
-        if not isinstance(other, ImageObject):
-            return False
+    #def __eq__(self, other):
+     #   if not isinstance(other, ImageObject):
+      #      return False
 
-        return self.get_exif_data == other.get_exif_data
+       # return self.get_exif_data == other.get_exif_data
 
     def __str__(self):
         return self.name
@@ -118,6 +121,7 @@ class FileContainer:
         return [x for x in ImageCollector.collect(self.dest_path)]
 
     def __contains__(self, image_obj):
+        print('in', image_obj)
         return image_obj in self.files
 
     def add(self, image_obj):
@@ -144,13 +148,13 @@ class FileSieve:
             if img_obj.is_valid(self.date_range):
                 img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
                 new_file_path = os.path.join(self.dest_path, img_obj.name)
-                img_obj.path = new_file_path
+                # TODO: DEBUG IT BECAUSE img.obj.path = new_file_path generate error, assigment should be after cloning i guess
+#                img_obj.path = new_file_path
 
-                if not img_obj in self.container:
-                    self.cloner.clone_single_file(img_obj.path, new_file_path)
-                    self.container.add(img_obj)
-                else:
-                    print('Image exists in this path')
+#                if not img_obj in self.container:
+                print(img_obj.path, new_file_path)
+                self.cloner.clone_single_file(img_obj.path, new_file_path)
+#                self.container.add(img_obj)
 
         self.container.sort()
 
