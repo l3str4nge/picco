@@ -96,11 +96,11 @@ class ImageObject:
     def created(self):
         return self.get_exif_data().get(self.DATE_CODE, None)
 
-    #def __eq__(self, other):
-     #   if not isinstance(other, ImageObject):
-      #      return False
+    def __eq__(self, other):
+        if not isinstance(other, ImageObject):
+            return False
 
-       # return self.get_exif_data == other.get_exif_data
+        return self.get_exif_data() == other.get_exif_data()
 
     def __str__(self):
         return self.name
@@ -143,18 +143,20 @@ class FileSieve:
         self.container = FileContainer(self.dest_path)
 
     def group(self):
-        os.mkdir(self.dest_path)
+        if not os.path.exists(self.dest_path):
+            os.mkdir(self.dest_path)
+
         for i, img_obj in enumerate(ImageCollector.collect(self.out_path)):
             if img_obj.is_valid(self.date_range):
                 img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
                 new_file_path = os.path.join(self.dest_path, img_obj.name)
-                # TODO: DEBUG IT BECAUSE img.obj.path = new_file_path generate error, assigment should be after cloning i guess
-#                img_obj.path = new_file_path
 
-#                if not img_obj in self.container:
-                print(img_obj.path, new_file_path)
-                self.cloner.clone_single_file(img_obj.path, new_file_path)
-#                self.container.add(img_obj)
+                if not img_obj in self.container:
+                    print('not exist, copyyin')
+                    self.cloner.clone_single_file(img_obj.path, new_file_path)
+                    self.container.add(img_obj)
+                else:
+                    print('exists, not copyyin')
 
         self.container.sort()
 
