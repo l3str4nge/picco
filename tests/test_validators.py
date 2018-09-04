@@ -1,29 +1,45 @@
 import os
 from unittest import TestCase
-from src.validators import CommandArgsValidator
+from src.validators import *
 
-class TestCommandArgsValidator(TestCase):
-    def setUp(self):
-        kwargs = {
-                'in': '/home/zawadeusz',
-                'out': '/home/zawadeusz',
-                'name': 'Test'
-        }
+class TestDateRangeValidator(TestCase):
+    def test_date_range_validator(self):
+        # everything is OK
+        test_date_range = '201702021010-201702021212'
+        validator = DateRangeValidator(test_date_range)
+        self.assertTrue(validator.is_valid())
 
-        self.validator = CommandArgsValidator(**kwargs)
+        # empty rangedate
+        validator.param = None
+        self.assertTrue(validator.is_valid())
 
-    def test_path_exist(self):
-        self.assertTrue(os.path.join('/tmp/'))
-        self.assertTrue(os.path.join('/home/mateusz/'))
-        self.assertTrue(os.path.join('/not_exist/'))
+        # not corrected datetime
+        validator.param = '201702021010'
+        self.assertFalse(validator.is_valid())
 
-    def test_check(self):
-        self.assertTrue(self.validator.check())
-        self.validator.kwargs['in'] = None
-        self.assertFalse(self.validator.check())
+        # start date > end date
+        validator.param = '201802021010-201702021010'
+        self.assertFalse(validator.is_valid())
 
-        self.validator.kwargs['in'] = '/tmp'
-        self.validator.kwargs['out'] = '/tmp'
-        self.validator.kwargs['name'] = 'elo'
-        self.assertTrue(self.validator.check())
+class TestNameValidator(TestCase):
+    def test_name(self):
+        # everithing is OK
+        name = 'TEST'
+        validator = NameValidator(name)
+        self.assertTrue(validator.is_valid())
+
+        # empty name
+        validator.param = None
+        self.assertFalse(validator.is_valid())
+
+class TestPathValidator(TestCase):
+    def test_path_exists(self):
+        # everything ok
+        path = '/tmp'
+        validator = PathValidator(path)
+        self.assertTrue(validator.is_valid())
+
+        # weird path
+        validator.param = '/TEST_THAT_NOT_EXISTS'
+        self.assertFalse(validator.is_valid())
 

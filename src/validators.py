@@ -3,6 +3,7 @@ import os
 import argparse
 import sys
 import logging
+from datetime import datetime
 from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
@@ -79,33 +80,4 @@ class CommandArgsValidator:
         for validator in self.validators:
             if not validator.is_valid():
                 return False
-
-
-
-        """
-        for key, value in self.kwargs.items():
-            if not value:
-                sys.stdout.write(f'--{key} is not defined! Try again.\n')
-                return False
-
-        if not self.path_exist(self.kwargs['in']):
-            return False
-
-        if not self.path_exist(self.kwargs['out']):
-            return False
-
-        if not DateRangeValidator(self.kwargs).is_valid():
-            return False
-        """
-
-        logger.info('Arguments are valid!')
-        return True
-
-    def path_exist(self, dir_path):
-        if not os.path.exists(os.path.join(dir_path)):
-            sys.stdout.write(f'Directory {dir_path} does not exists.\n')
-            return False
-
-        return True
-
 
