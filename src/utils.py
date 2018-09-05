@@ -1,13 +1,13 @@
 import os
 import shutil
 import logging
+import sys
 from datetime import datetime
 
 from PIL import Image
 
 logger = logging.getLogger(__name__)
 
-""" RENAME IT TO TEMP CLONER """
 class FileCloner:
     TMP = '/tmp'
 
@@ -44,14 +44,13 @@ class ImageObject:
         self.name = name
         self.path = os.path.join(dir_path, name)
         self.instance = self.open()
-        self.extension = None # TODO: extensions!
 
     def open(self):
         try:
             return Image.open(self.path)
         except Exception as e:
-            # TODO: error handling
-            pass
+            # TODO: add logging when ready
+            print("Cannot open this file", e)
 
     def get_extension(self):
         return self.name.split('.')[-1]
@@ -73,6 +72,7 @@ class ImageObject:
         if not date_range:
             # we allow to not hae date_range to clone whole files
             return True
+
         date_format = '%Y%m%d%H%M'
         exif_date_format = '%Y:%m:%d %H:%M:%S'
         splitted = date_range.split('-')
@@ -121,8 +121,10 @@ class FileContainer:
         return [x for x in ImageCollector.collect(self.dest_path)]
 
     def __contains__(self, image_obj):
-        print('in', image_obj)
         return image_obj in self.files
+
+    def __len__(self):
+        return len(self.files)
 
     def add(self, image_obj):
         self.files.append(image_obj)
@@ -130,8 +132,9 @@ class FileContainer:
     def sort(self):
         sorted_files = sorted(self.files, key=lambda k: k.created())
         for i, f in enumerate(sorted_files):
-            pass
+            # TODO: rename all files and sort it by date
             # TODO add sorting after firsts tests
+            pass
 
 class FileSieve:
     def __init__(self, out, dest, dir_name, date_range):
@@ -141,22 +144,32 @@ class FileSieve:
         self.date_range = date_range
         self.cloner = FileCloner(dir_name)
         self.container = FileContainer(self.dest_path)
+        self.not_copied = []
+
 
     def group(self):
         if not os.path.exists(self.dest_path):
+            sys.stdout.write('{self.dest_path} does not exists... created.\n')
             os.mkdir(self.dest_path)
 
         for i, img_obj in enumerate(ImageCollector.collect(self.out_path)):
+            sys.stdout.write(f'{i}) Copy {img_obj.path} to {self.dest_path}\n')
             if img_obj.is_valid(self.date_range):
                 img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
                 new_file_path = os.path.join(self.dest_path, img_obj.name)
 
+                # TODO: manage better not copied and copied when file exists in directory
+                # FileContainer -> add method with extra parameters like copied or not
+                # Move self.not_copied to FileContainer and inside manage file states
                 if not img_obj in self.container:
-                    print('not exist, copyyin')
                     self.cloner.clone_single_file(img_obj.path, new_file_path)
                     self.container.add(img_obj)
                 else:
-                    print('exists, not copyyin')
-
+                    self.not_copied.append(img_obj)
+                    sys.stdout.write('File ommited because it is exists in destination directory\n')
+            else:
+                sys.stdout.write('File is not valid, ommited.... added to not copied files...\n')
+                self.not_copied.append(img_obj)
+            sys.stdout.write('------------------------------------------------------------------\n')
         self.container.sort()
 

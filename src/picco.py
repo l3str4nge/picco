@@ -17,9 +17,9 @@ def main():
     parser.add_argument('--name', help='Folder name to create in --out')
     args = parser.parse_args()
 
-
     logger.info('Checking arguments...')
     if not CommandArgsValidator(**args.__dict__).check():
+        print('dsadada')
         return False
 
     logger.info('Start application')

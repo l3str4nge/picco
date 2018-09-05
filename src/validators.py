@@ -21,7 +21,7 @@ class DateRangeValidator(BaseValidator):
         date_range = self.param
 
         if not date_range:
-            logger.info('Date range is not defined, all files will be cloned...\n')
+            sys.stdout.write('Date range is not defined, all files will be cloned...\n')
             return True
 
         date_format = '%Y%m%d%H%M'
@@ -36,7 +36,7 @@ class DateRangeValidator(BaseValidator):
         date_end = datetime.strptime(splitted[1], date_format)
 
         if date_start > date_end:
-            logger.info('Date end cannot be bigger than date start\n')
+            sys.stdout.write('Date end cannot be bigger than date start\n')
             return False
 
         return True
@@ -80,4 +80,6 @@ class CommandArgsValidator:
         for validator in self.validators:
             if not validator.is_valid():
                 return False
+
+        return True
 
