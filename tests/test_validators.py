@@ -43,3 +43,19 @@ class TestPathValidator(TestCase):
         validator.param = '/TEST_THAT_NOT_EXISTS'
         self.assertFalse(validator.is_valid())
 
+class TestFileValidator(TestCase):
+    FILE_OK = '/home/zawadeusz/Documents/picco/tests/testing_file_OK.txt'
+    FILE_BAD = '/home/zawadeusz/Documents/picco/tests/testing_file_BAD.txt'
+
+    def test_file_exists(self):
+        validator = FileValidator(self.FILE_OK)
+        self.assertTrue(validator.is_valid())
+
+        validator = FileValidator('/TEST_NOT_EXISTS')
+        self.assertFalse(validator.is_valid())
+
+    def test_file_content(self):
+        self.assertFalse(FileValidator('/TEST_NOT_EXISTS').is_valid())
+        self.assertTrue(FileValidator(self.FILE_OK).is_valid())
+        self.assertFalse(FileValidator(self.FILE_BAD).is_valid())
+

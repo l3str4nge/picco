@@ -15,11 +15,11 @@ def main():
     parser.add_argument('--out', help='Path for the OUTPUT files')
     parser.add_argument('--date', help='Date when files where made')
     parser.add_argument('--name', help='Folder name to create in --out')
+    parser.add_argument('--file', help='Put .txt file with multiple --in, --out, --name etc.')
     args = parser.parse_args()
 
     logger.info('Checking arguments...')
     if not CommandArgsValidator(**args.__dict__).check():
-        print('dsadada')
         return False
 
     logger.info('Start application')

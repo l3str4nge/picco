@@ -66,15 +66,52 @@ class NameValidator(BaseValidator):
 
         return True
 
+class FileValidator(BaseValidator):
+    def is_valid(self):
+        self.path = self.param
+
+        if not PathValidator(self.path).is_valid():
+            return False
+
+        """ Check given file line by line """
+        with open(self.path, 'r') as input_file:
+            splitted_line = input_file.readline().split(' ')
+
+            if len(splitted_line) < 4:
+                return False
+
+            path_in, path_out = splitted_line[:2]
+            if not PathValidator(path_in).is_valid():
+                return False
+
+            if not PathValidator(path_out).is_valid():
+                return False
+
+            if not NameValidator(splitted_line[2]).is_valid():
+                return False
+
+            if not DateRangeValidator(splitted_line[3]).is_valid():
+                return False
+
+        return True
+
 class CommandArgsValidator:
     def __init__(self, *args, **kwargs):
         self.kwargs = kwargs
-        self.validators = [
-                PathValidator(self.kwargs['in']),
-                PathValidator(self.kwargs['out']),
-                NameValidator(self.kwargs['name']),
-                DateRangeValidator(self.kwargs['date']),
-        ]
+
+        """ If file path is given then we omit every validators because
+            all the data will be read from given file, so we only have to
+            check this file but we need above validators to do that
+        """
+        if not self.kwargs['file']:
+            self.validators = [
+                    PathValidator(self.kwargs['in']),
+                    PathValidator(self.kwargs['out']),
+                    NameValidator(self.kwargs['name']),
+                    DateRangeValidator(self.kwargs['date']),
+            ]
+        else:
+            self.validators = [FileValidator(self.kwargs['file'])]
 
     def check(self):
         for validator in self.validators:
