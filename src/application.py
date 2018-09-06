@@ -5,9 +5,17 @@ class Application(object):
     def __init__(self, *args, **kwargs):
         self.kwargs = kwargs
         self.multiple = False # flag to cloning images from file
+        self.to_zip = False
+        self.to_upload = False
 
         if self.kwargs.get('file'):
             self.multiple = True
+
+        if self.kwargs.get('zip'):
+            self.to_zip = True
+
+        if self.kwargs.get('upload'):
+            self.to_upload = True
 
     def run(self):
         sys.stdout.write('Application starts....\n Start cloning files... \n')
@@ -27,6 +35,14 @@ class Application(object):
     def run_single(self, *args):
         self.sieve = FileSieve(*args)
         self.sieve.group()
+
+        """ Checking flags for zip containers and upload them to Google Drive """
+        if self.to_zip:
+            pass
+
+        if self._to_upload:
+            # TODO: self.to_zip == True
+            pass
 
     def run_multiple(self):
         file_path = self.kwargs.get('file')

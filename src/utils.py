@@ -175,3 +175,9 @@ class FileSieve:
             sys.stdout.write('------------------------------------------------------------------\n')
         self.container.sort()
 
+
+class FileZipper:
+    pass
+
+class GoogleDriveUploader:
+    pass
