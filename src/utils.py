@@ -116,6 +116,7 @@ class FileContainer:
     def __init__(self, dest_path):
         self.dest_path = dest_path
         self.files = self.get_files()
+        self.files_omitted= []
 
     def get_files(self):
         return [x for x in ImageCollector.collect(self.dest_path)]
@@ -126,8 +127,14 @@ class FileContainer:
     def __len__(self):
         return len(self.files)
 
+    def len_omitted(self):
+        return len(self.files_omitted)
+
     def add(self, image_obj):
         self.files.append(image_obj)
+
+    def omit(self, image_obj):
+        self.files_omitted.append(image_obj)
 
     def sort(self):
         sorted_files = sorted(self.files, key=lambda k: k.created())
@@ -144,8 +151,6 @@ class FileSieve:
         self.date_range = date_range
         self.cloner = FileCloner(dir_name)
         self.container = FileContainer(self.dest_path)
-        self.not_copied = []
-
 
     def group(self):
         if not os.path.exists(self.dest_path):
@@ -158,18 +163,15 @@ class FileSieve:
                 img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
                 new_file_path = os.path.join(self.dest_path, img_obj.name)
 
-                # TODO: manage better not copied and copied when file exists in directory
-                # FileContainer -> add method with extra parameters like copied or not
-                # Move self.not_copied to FileContainer and inside manage file states
                 if not img_obj in self.container:
                     self.cloner.clone_single_file(img_obj.path, new_file_path)
                     self.container.add(img_obj)
                 else:
-                    self.not_copied.append(img_obj)
+                    self.container.omit(img_obj)
                     sys.stdout.write('File ommited because it is exists in destination directory\n')
             else:
                 sys.stdout.write('File is not valid, ommited.... added to not copied files...\n')
-                self.not_copied.append(img_obj)
+                self.container.omit(img_obj)
             sys.stdout.write('------------------------------------------------------------------\n')
         self.container.sort()
 

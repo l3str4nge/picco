@@ -16,6 +16,7 @@ class Application(object):
         self.sieve.group()
         sys.stdout.write('Cloning ends....\n')
         sys.stdout.write('Statistics:\n')
+
         sys.stdout.write(f'Files copied: {len(self.sieve.container)}\n')
-        sys.stdout.write(f'Files not copied: {len(self.sieve.not_copied)}\n')
+        sys.stdout.write(f'Files not copied: {self.sieve.container.len_omitted()}\n')
 
