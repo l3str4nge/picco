@@ -25,7 +25,7 @@ class DateRangeValidator(BaseValidator):
             return True
 
         date_format = '%Y%m%d%H%M'
-        splitted = date_range.split('-')
+        splitted = date_range.rstrip().split('-')
 
         if len(splitted) != 2:
             sys.stdout.write('daterange is not correctly\n')
