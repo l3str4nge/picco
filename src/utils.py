@@ -3,6 +3,7 @@ import shutil
 import logging
 import sys
 from datetime import datetime
+from zipfile import ZipFile
 
 from PIL import Image
 
@@ -136,6 +137,14 @@ class FileContainer:
     def omit(self, image_obj):
         self.files_omitted.append(image_obj)
 
+    def get_copied(self):
+        for item in self.files:
+            yield item
+
+    def get_omitted(self):
+        for item in self.files_omitted:
+            yield item
+
     def sort(self):
         sorted_files = sorted(self.files, key=lambda k: k.created())
         for i, f in enumerate(sorted_files):
@@ -165,6 +174,7 @@ class FileSieve:
 
                 if not img_obj in self.container:
                     self.cloner.clone_single_file(img_obj.path, new_file_path)
+                    img_obj.path = new_file_path
                     self.container.add(img_obj)
                 else:
                     self.container.omit(img_obj)
@@ -176,8 +186,17 @@ class FileSieve:
         self.container.sort()
 
 
-class FileZipper:
-    pass
+class FileCompressor:
+    def __init__(self, container, path, name):
+        self.container = container
+        self.path = path
+        self.name = f'{name}.zip'
+
+    def compress_files(self):
+        file_path = os.path.join(self.path, self.name)
+        with ZipFile(file_path, 'w') as zip_file:
+            for obj in self.container.get_copied():
+                zip_file.write(obj.path, obj.name)
 
 class GoogleDriveUploader:
     pass

@@ -2,7 +2,11 @@ import os
 import sys
 import shutil
 from unittest import TestCase
-from src.utils import FileCloner, FileSieve, ImageObject
+from src.utils import (
+  FileCloner, FileSieve,
+  ImageObject, FileContainer,
+  FileCompressor
+)
 
 class BaseTest(TestCase):
     FILES_NUMBER = 9
@@ -78,4 +82,11 @@ class TestImageObject(TestCase):
         path_object = '/home/zawadeusz/Documents/picco/tests/images'
         obj = ImageObject('TEST1.jpg', path_object)
         print(obj.created())
+
+class TestFileCompressor(TestCase):
+    def test_compress_files(self):
+        path = '/home/zawadeusz/Documents/picco/tests/images'
+        container = FileContainer(path)
+        compressor = FileCompressor(container, '/tmp', 'ZIPPPED')
+        compressor.compress_files()
 
