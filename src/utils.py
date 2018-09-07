@@ -191,12 +191,18 @@ class FileCompressor:
         self.container = container
         self.path = path
         self.name = f'{name}.zip'
+        self.file_path = os.path.join(self.path, self.name)
 
     def compress_files(self):
-        file_path = os.path.join(self.path, self.name)
-        with ZipFile(file_path, 'w') as zip_file:
+        with ZipFile(self.file_path, 'w') as zip_file:
             for obj in self.container.get_copied():
                 zip_file.write(obj.path, obj.name)
+
+    def get_compressed_size(self):
+        return os.path.getsize(self.file_path)
+
+    def get_compressed_size_in_mb(self):
+        return round(self.get_compressed_size() / 1024 / 1024, 2)
 
 class GoogleDriveUploader:
     pass

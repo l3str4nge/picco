@@ -42,7 +42,7 @@ class Application(object):
             container = self.sieve.container
             compressor = FileCompressor(container, self.kwargs['out'], self.kwargs['name'])
             compressor.compress_files()
-            sys.stdout.write(f'Compressing ends, file name: {compressor.name}\n')
+            sys.stdout.write(f'Compressing ends, file name: {compressor.name}, file size: {compressor.get_compressed_size_in_mb()} mb\n')
 
         if self.to_upload:
             # TODO: self.to_zip == True
