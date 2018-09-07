@@ -1,4 +1,4 @@
-from utils import FileSieve
+from utils import FileSieve, FileCompressor
 import sys
 
 class Application(object):
@@ -38,9 +38,13 @@ class Application(object):
 
         """ Checking flags for zip containers and upload them to Google Drive """
         if self.to_zip:
-            pass
+            sys.stdout.write('Start compressing files...\n')
+            container = self.sieve.container
+            compressor = FileCompressor(container, self.kwargs['out'], self.kwargs['name'])
+            compressor.compress_files()
+            sys.stdout.write(f'Compressing ends, file name: {compressor.name}\n')
 
-        if self._to_upload:
+        if self.to_upload:
             # TODO: self.to_zip == True
             pass
 
