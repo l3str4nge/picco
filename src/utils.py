@@ -204,5 +204,3 @@ class FileCompressor:
     def get_compressed_size_in_mb(self):
         return round(self.get_compressed_size() / 1024 / 1024, 2)
 
-class GoogleDriveUploader:
-    pass

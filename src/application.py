@@ -1,4 +1,5 @@
 from utils import FileSieve, FileCompressor
+from google_drive_upload import Uploader, SCOPES_FULL_AUTH, MIMETYPE_ZIP
 import sys
 
 class Application(object):
@@ -44,9 +45,9 @@ class Application(object):
             compressor.compress_files()
             sys.stdout.write(f'Compressing ends, file name: {compressor.name}, file size: {compressor.get_compressed_size_in_mb()} mb\n')
 
-        if self.to_upload:
-            # TODO: self.to_zip == True
-            pass
+        if self.to_zip and self.to_upload:
+            uploader = Uploader(SCOPES_FULL_AUTH)
+            uploader.upload_file(compressor.file_path, compressor.name, MIMETYPE_ZIP)
 
     def run_multiple(self):
         file_path = self.kwargs.get('file')
