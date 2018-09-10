@@ -1,0 +1,5 @@
+TODO:
+- create logger class for entire application with saving into file
+- versions? :D
+- tests,
+
