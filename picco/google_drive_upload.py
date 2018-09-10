@@ -48,8 +48,3 @@ class Uploader:
 
         return True
 
-    def upload_from_file(self, file_path):
-        """ Upload from files """
-        pass
-
-
