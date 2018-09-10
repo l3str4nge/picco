@@ -90,7 +90,9 @@ class ImageObject:
 
     def get_exif_data(self):
         if self.instance:
-            return self.instance._getexif()
+            exif = self.instance._getexif() or {}
+            self.instance.close()
+            return exif
 
         return {}
 
@@ -169,7 +171,7 @@ class FileSieve:
         for i, img_obj in enumerate(ImageCollector.collect(self.out_path)):
             sys.stdout.write(f'{i}) Copy {img_obj.path} to {self.dest_path}\n')
             if img_obj.is_valid(self.date_range):
-                img_obj.name = f'{self.dir_name}_{i}.{img_obj.get_extension()}'
+                img_obj.name = f'{self.dir_name}_{img_obj.created()}.{img_obj.get_extension()}'
                 new_file_path = os.path.join(self.dest_path, img_obj.name)
 
                 if not img_obj in self.container:
