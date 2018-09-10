@@ -26,9 +26,13 @@ class Uploader:
 
     def authorize(self, scope):
         store = file.Storage(TOKEN_PATH)
-        flow = client.flow_from_clientsecrets(CREDENTIALS_PATH, scope)
-        flags = tools.argparser.parse_args([])
-        creds = tools.run_flow(flow, store, flags)
+        creds = store.get()
+
+        if not creds or creds.invalid :
+            flow = client.flow_from_clientsecrets(CREDENTIALS_PATH, scope)
+            flags = tools.argparser.parse_args([])
+            creds = tools.run_flow(flow, store, flags)
+
         service = build('drive', 'v3', http=creds.authorize(Http()))
         return service
 
