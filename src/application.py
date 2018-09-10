@@ -46,8 +46,10 @@ class Application(object):
             sys.stdout.write(f'Compressing ends, file name: {compressor.name}, file size: {compressor.get_compressed_size_in_mb()} mb\n')
 
         if self.to_zip and self.to_upload:
+            sys.stdout.write('Start uploading file to Google Drive, it might took a while....\n')
             uploader = Uploader(SCOPES_FULL_AUTH)
             uploader.upload_file(compressor.file_path, compressor.name, MIMETYPE_ZIP)
+            sys.stdout.write('Uploading finished.\n')
 
     def run_multiple(self):
         file_path = self.kwargs.get('file')
